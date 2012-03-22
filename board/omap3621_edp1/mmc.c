@@ -282,3 +282,65 @@ void board_mmc_init(void)
 		fastboot_flash_add_ptn(&ptn[i]);
 #endif
 }
+
+int determine_boot_type(void)
+{
+        /* FIXME: Initialise LCD here */
+        
+        if (running_from_sd()) {
+                lcd_putc('S');
+                } else {
+                lcd_putc('E'); }
+
+        switch(get_boot_action()) {
+        case BOOT_SD_NORMAL:
+                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 boot.img; booti 0x81000000");
+                setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+                display_feedback(BOOT_SD_NORMAL);
+                break;
+
+        case BOOT_SD_RECOVERY:
+                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 recovery.img; booti 0x81000000");
+                setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+                display_feedback(BOOT_SD_RECOVERY);
+                break;
+
+        case BOOT_SD_ALTBOOT:
+                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 altboot.img; booti 0x81000000");
+                setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+                display_feedback(BOOT_SD_ALTBOOT);
+                break;
+
+        //actually, boot from boot+512K -- thanks bauwks!
+        case BOOT_EMMC_NORMAL:
+                setenv("bootcmd", "mmcinit 1; booti mmc1 boot 0x80000");
+                display_feedback(BOOT_EMMC_NORMAL);
+                break;
+
+        //actually, boot from recovery+512K -- thanks bauwks!
+        case BOOT_EMMC_RECOVERY:
+                setenv("bootcmd", "mmcinit 1; booti mmc1 recovery 0x80000");
+                display_feedback(BOOT_EMMC_RECOVERY);
+                break;
+
+        case BOOT_EMMC_ALTBOOT:  // no 512K offset, this is just a file.
+                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${emmcbootargs}; run setbootargs; mmcinit 1; fatload mmc 1:5 0x81000000 altboot.img; booti 0x81000000");
+                setenv ("altbootcmd", "run bootcmd"); // for emmc altboot altbootcmd is the same as bootcmd
+                display_feedback(BOOT_EMMC_ALTBOOT);
+                break;
+
+        case BOOT_FASTBOOT:
+                display_feedback(BOOT_FASTBOOT);
+                run_command("fastboot", 0);
+                break;
+        case INVALID:
+        default:
+                printf("Aborting boot!\n");
+                return 1;
+        }
+
+        return 0;
+}
+
+
+}

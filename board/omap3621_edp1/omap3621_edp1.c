@@ -1353,3 +1353,8 @@ void update_mux(u32 btype, u32 mtype)
 	/* NOTHING as of now... */
 }
 
+int board_late_init(void)
+{
+  return determine_boot_type();
+}
+
