@@ -63,6 +63,8 @@
 #define CONFIG_3621EDP1		1    /* working with EDP1 */
 #define CONFIG_BOARD_REVISION   1    /* Board revision */
 
+#define CONFIG_LCD             1
+
 //&*&*&*20101201_Peter ++
 #define CONFIG_NEW_DISPLAY_BOARD_INFO	1
 

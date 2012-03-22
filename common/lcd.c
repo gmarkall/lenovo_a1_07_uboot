@@ -222,6 +222,22 @@ void lcd_puts (const char *s)
 	}
 }
 
+
+void lcd_console_setpos(short row, short col)
+{
+  console_row = (row>0)? ((row > c_max_rows)? c_max_rows:row):0;
+  console_col = (col>0)? ((col > c_max_cols)? c_max_cols:col):0;
+}
+
+
+/*----------------------------------------------------------------------*/
+
+void lcd_console_setcolor(int fg, int bg)
+{
+  lcd_color_fg = fg;
+  lcd_color_bg = bg;
+}
+
 /************************************************************************/
 /* ** Low-Level Graphics Routines					*/
 /************************************************************************/

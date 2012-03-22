@@ -157,10 +157,13 @@ void	lcd_disable	(void);
 #endif
 
 
-/* int	lcd_init	(void *lcdbase); */
+int	lcd_init	(void *lcdbase);
 void	lcd_putc	(const char c);
 void	lcd_puts	(const char *s);
 void	lcd_printf	(const char *fmt, ...);
+
+void lcd_console_setpos(short row, short col);
+void lcd_console_setcolor(int fg, int bg);
 
 
 /************************************************************************/

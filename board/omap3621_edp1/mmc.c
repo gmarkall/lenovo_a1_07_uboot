@@ -24,6 +24,8 @@
 #include <asm/io.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/mem.h>
+#include "menu.h"
+#include <lcd.h>
 
 #if (CONFIG_FASTBOOT)
 #include <fastboot.h>
@@ -283,49 +285,104 @@ void board_mmc_init(void)
 #endif
 }
 
+//stub - this should output text
+static void display_feedback(enum boot_action image)
+{
+//	uint16_t *image_start;
+//	uint16_t *image_end;
+
+//	lcd_bl_set_brightness(255);
+ 	lcd_console_setpos(52, 25);
+	lcd_console_setcolor(CONSOLE_COLOR_CYAN, CONSOLE_COLOR_BLACK);
+
+	switch(image) {
+
+	case BOOT_EMMC_NORMAL:
+		lcd_puts("    Loading (EMMC)...");
+		break;
+	case BOOT_SD_RECOVERY:
+		lcd_puts("Loading Recovery from SD...");
+		break;
+	case BOOT_SD_ALTBOOT:
+		lcd_puts(" Loading AltBoot from SD...");
+		break;
+	case BOOT_SD_NORMAL:
+		lcd_puts("     Loading (SD)...");
+		break;
+	case BOOT_EMMC_RECOVERY:
+		lcd_puts("Loading Recovery from EMMC...");
+		break;
+	case BOOT_EMMC_ALTBOOT:
+		lcd_puts(" Loading AltBoot from EMMC...");
+		break;
+	case BOOT_FASTBOOT:
+		lcd_puts(" - fastboot has started -");
+		break;
+	default:
+		lcd_puts("        Loading...");
+		break;
+	}
+
+	//lcd_display_image(image_start, image_end);
+}
+
+/*  gmarkall -- again see encore.  These two functions may be moved to work w/the existing
+                common/main.c stuff so that you can take advantage of the current behavior.  Just
+                grab your different boot scenarios from that file and have them handled via a switch
+                statement.  Then use main.c's logic for determining what to boot and have it set one
+                of the enum values above.  Then you can have a catch all function to handle each of those
+                scenarios.  Once that's working, add the menu in, and it'll be a way to "override" the
+                default behavior.  Hope this makes sense --ft */
+
 int determine_boot_type(void)
 {
         /* FIXME: Initialise LCD here */
-        
+        /*
         if (running_from_sd()) {
                 lcd_putc('S');
                 } else {
-                lcd_putc('E'); }
+                lcd_putc('E'); }   This is nice to have working but not necessary */
 
-        switch(get_boot_action()) {
+	int result=0;
+
+	result=do_menu();
+
+        switch(result) {
         case BOOT_SD_NORMAL:
-                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 boot.img; booti 0x81000000");
-                setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+             //   setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 boot.img; booti 0x81000000");
+             //   setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
                 display_feedback(BOOT_SD_NORMAL);
                 break;
 
         case BOOT_SD_RECOVERY:
-                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 recovery.img; booti 0x81000000");
-                setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+            //    setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 recovery.img; booti 0x81000000");
+            //    setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+                run_command("recoverymode",0);  
                 display_feedback(BOOT_SD_RECOVERY);
                 break;
 
         case BOOT_SD_ALTBOOT:
-                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 altboot.img; booti 0x81000000");
-                setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
+             //   setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 altboot.img; booti 0x81000000");
+             //   setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
                 display_feedback(BOOT_SD_ALTBOOT);
                 break;
 
         //actually, boot from boot+512K -- thanks bauwks!
         case BOOT_EMMC_NORMAL:
-                setenv("bootcmd", "mmcinit 1; booti mmc1 boot 0x80000");
-                display_feedback(BOOT_EMMC_NORMAL);
+            //    setenv("bootcmd", "mmcinit 1; booti mmc1 boot 0x80000");
+            //    display_feedback(BOOT_EMMC_NORMAL);
                 break;
 
         //actually, boot from recovery+512K -- thanks bauwks!
         case BOOT_EMMC_RECOVERY:
-                setenv("bootcmd", "mmcinit 1; booti mmc1 recovery 0x80000");
-                display_feedback(BOOT_EMMC_RECOVERY);
+             //   setenv("bootcmd", "mmcinit 1; booti mmc1 recovery 0x80000");
+             //   display_feedback(BOOT_EMMC_RECOVERY);
+                run_command("recoverymode",0);
                 break;
 
         case BOOT_EMMC_ALTBOOT:  // no 512K offset, this is just a file.
-                setenv ("bootcmd", "setenv setbootargs setenv bootargs ${emmcbootargs}; run setbootargs; mmcinit 1; fatload mmc 1:5 0x81000000 altboot.img; booti 0x81000000");
-                setenv ("altbootcmd", "run bootcmd"); // for emmc altboot altbootcmd is the same as bootcmd
+             //   setenv ("bootcmd", "setenv setbootargs setenv bootargs ${emmcbootargs}; run setbootargs; mmcinit 1; fatload mmc 1:5 0x81000000 altboot.img; booti 0x81000000");
+             //   setenv ("altbootcmd", "run bootcmd"); // for emmc altboot altbootcmd is the same as bootcmd
                 display_feedback(BOOT_EMMC_ALTBOOT);
                 break;
 
@@ -340,7 +397,4 @@ int determine_boot_type(void)
         }
 
         return 0;
-}
-
-
 }

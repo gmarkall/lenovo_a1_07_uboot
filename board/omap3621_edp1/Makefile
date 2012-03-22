@@ -28,7 +28,8 @@ OBJS	:= \
 	omap3621_edp1.o \
 	sys_info.o \
 	mmc.o \
-	share_region.o
+	share_region.o \
+	menu.o
 
 $(LIB):	$(OBJS)
 	$(AR) crv $@ $^

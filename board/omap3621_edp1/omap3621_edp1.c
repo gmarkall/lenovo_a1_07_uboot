@@ -35,6 +35,7 @@
 #include <asm/mach-types.h>
 #include <linux/mtd/nand_ecc.h>
 #include <twl4030.h>
+#include "menu.h"
 
 #if defined (CONFIG_SHARE_REGION)
 #include <share_region.h>
