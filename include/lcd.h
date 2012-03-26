@@ -148,7 +148,36 @@ typedef struct vidinfo {
 
 extern vidinfo_t panel_info;
 
-#endif /* CONFIG_MPC823 or CONFIG_PXA250 */
+#elif defined(CONFIG_3621EDP1)
+
+#include <asm/arch-omap3/dss.h>
+
+#define LCD_BPP LCD_COLOR16
+
+typedef struct vidinfo {
+        ushort  vl_col;         /* Number of columns (i.e. 640) */
+        ushort  vl_row;         /* Number of rows (i.e. 480) */
+        ushort  vl_width;       /* Width of display area in millimeters */
+        ushort  vl_height;      /* Height of display area in millimeters */
+
+        /* LCD configuration register */
+        u_char  vl_clkp;        /* Clock polarity */
+        u_char  vl_oep;         /* Output Enable polarity */
+        u_char  vl_hsp;         /* Horizontal Sync polarity */
+        u_char  vl_vsp;         /* Vertical Sync polarity */
+        u_char  vl_dp;          /* Data polarity */
+        u_char  vl_bpix;        /* Bits per pixel, 0 = 1, 1 = 2, 2 = 4, 3 = 8, 4 = 16 */
+        u_char  vl_lbw;         /* LCD Bus width, 0 = 4, 1 = 8 */
+        u_char  vl_splt;        /* Split display, 0 = single-scan, 1 = dual-scan */
+        u_char  vl_clor;        /* Color, 0 = mono, 1 = color */
+        u_char  vl_tft;         /* 0 = passive, 1 = TFT */
+
+        struct panel_config dss_panel_config;       
+} vidinfo_t;
+
+extern vidinfo_t panel_info; 
+
+#endif /* CONFIG_MPC823 or CONFIG_PXA250 or CONFIG_3621EDP1 */
 
 /* Video functions */
 
@@ -157,7 +186,7 @@ void	lcd_disable	(void);
 #endif
 
 
-int	lcd_init	(void *lcdbase);
+static int	lcd_init	(void *lcdbase);
 void	lcd_putc	(const char c);
 void	lcd_puts	(const char *s);
 void	lcd_printf	(const char *fmt, ...);
@@ -245,6 +274,12 @@ void lcd_console_setcolor(int fg, int bg);
  */
 # define CONSOLE_COLOR_BLACK	0x0000
 # define CONSOLE_COLOR_WHITE	0xffff	/* Must remain last / highest	*/
+# define CONSOLE_COLOR_BLUE   0x001F
+# define CONSOLE_COLOR_GREEN  0x07E0  
+# define CONSOLE_COLOR_RED    0xF800  
+# define CONSOLE_COLOR_YELLOW   (CONSOLE_COLOR_BLUE | CONSOLE_COLOR_GREEN)
+# define CONSOLE_COLOR_MAGENTA  (CONSOLE_COLOR_RED | CONSOLE_COLOR_BLUE)
+# define CONSOLE_COLOR_CYAN     (CONSOLE_COLOR_RED | CONSOLE_COLOR_GREEN)
 
 #endif /* color definitions */
 
@@ -275,7 +310,7 @@ void lcd_console_setcolor(int fg, int bg);
 #if LCD_BPP == LCD_MONOCHROME
 # define COLOR_MASK(c)		((c)	  | (c) << 1 | (c) << 2 | (c) << 3 | \
 				 (c) << 4 | (c) << 5 | (c) << 6 | (c) << 7)
-#elif LCD_BPP == LCD_COLOR8
+#elif LCD_BPP == LCD_COLOR8 || LCD_BPP == LCD_COLOR16
 # define COLOR_MASK(c)		(c)
 #else
 # error Unsupported LCD BPP.

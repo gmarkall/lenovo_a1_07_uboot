@@ -222,6 +222,11 @@ void lcd_puts (const char *s)
 	}
 }
 
+/* FIXME: Just trying to get it to compile for now. May need revision. */
+#define VL_COL 1024
+#define VL_ROW 600
+int c_max_rows = VL_COL/VIDEO_FONT_HEIGHT;
+int c_max_cols = VL_ROW/VIDEO_FONT_WIDTH;
 
 void lcd_console_setpos(short row, short col)
 {
