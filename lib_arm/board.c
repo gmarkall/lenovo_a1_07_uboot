@@ -288,7 +288,7 @@ void start_armboot (void)
 	init_fnc_t **init_fnc_ptr;
 	char *s;
 	int ret;
-#ifndef CFG_NO_FLASH
+#if !defined(CFG_NO_FLASH) || defined(CONFIG_LCD)
 	ulong size = 0;
 #endif
 #if defined(CONFIG_VFD) || defined(CONFIG_LCD)
