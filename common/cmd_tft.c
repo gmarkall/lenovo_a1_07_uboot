@@ -299,10 +299,11 @@ static void disp_hanstar_off(void)
 /* LH_SWRD_CL1_Mervins@2011.06.03--> */
 
 /* FIXME: Just a hack. could be wrong. */
-static void lcd_disable()
-{
-  disp_hanstar_off();
-}
+/* Removed - function exists in omap3621_edp1_panel.c */
+//static void lcd_disable()
+//{
+ // disp_hanstar_off();
+//}
 
 
 static void dispc_clr_cmd(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])

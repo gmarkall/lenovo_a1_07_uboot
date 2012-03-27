@@ -26,6 +26,7 @@ LIB	= lib$(BOARD).a
 
 OBJS	:= \
 	omap3621_edp1.o \
+        omap3621_edp1_panel.o \
 	sys_info.o \
 	mmc.o \
 	share_region.o \

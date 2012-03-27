@@ -48,8 +48,8 @@ extern int gpio_pin_write(u32, gpio_level_t);
 vidinfo_t panel_info = {
     .vl_col     = 1024,
     .vl_row     = 600,
-    .vl_width   = 163,
-    .vl_height  = 103,
+    .vl_width   = 155,
+    .vl_height  = 91,
 
     .vl_clkp    = CFG_HIGH,
     .vl_oep     = CFG_HIGH,
@@ -129,22 +129,23 @@ int spi_chipsel_cnt = sizeof(spi_chipsel) / sizeof(spi_chipsel[0]);
 
 #endif /* (CONFIG_COMMANDS & CFG_CMD_SPI) */
 
-void lcd_spi_send(unsigned char reg_addr, unsigned char reg_data)
-{
-    int ret = 0;
-    int msg,imsg;
-    uchar omsg[2];
-    msg=(reg_addr<<10)|reg_data;
-
-    // note big endian, so swap
-    omsg[0]=(msg>>8)&0xff;
-    omsg[1]=(msg)&0xff;
-
-    spi_xfer(spi_chipsel[0], 16,( uchar *)omsg, (uchar *) &imsg);
-
-    // wait for transaction to finish
-    udelay(400);
-}
+// Commented out - panel is not SPI so shouldn't be needed.
+// void lcd_spi_send(unsigned char reg_addr, unsigned char reg_data)
+// {
+//     int ret = 0;
+//     int msg,imsg;
+//     uchar omsg[2];
+//     msg=(reg_addr<<10)|reg_data;
+// 
+//     // note big endian, so swap
+//     omsg[0]=(msg>>8)&0xff;
+//     omsg[1]=(msg)&0xff;
+// 
+//     spi_xfer(spi_chipsel[0], 16,( uchar *)omsg, (uchar *) &imsg);
+// 
+//     // wait for transaction to finish
+//     udelay(400);
+// }
 
 static inline u32 read_gpt8_reg(u32 reg)
 {
@@ -171,125 +172,131 @@ void lcd_adjust_brightness(int level);
 
  void enable_backlight(void) 
 {
-    DECLARE_GLOBAL_DATA_PTR;
-    u32 l;
+    // FIXME: Populate with correct stuff if required.
+    //DECLARE_GLOBAL_DATA_PTR;
+    //u32 l;
    
   
-    sr32(CM_CLKSEL_PER, 6, 1, 0x0); /* CLKSEL = 32Khz */
-    sr32(CM_FCLKEN_PER, 9, 1, 0x1); /* FCLKEN GPT8 */
-    sr32(CM_ICLKEN_PER, 9, 1, 0x1); /* ICLKEN GPT8 */
+    //sr32(CM_CLKSEL_PER, 6, 1, 0x0); /* CLKSEL = 32Khz */
+    //sr32(CM_FCLKEN_PER, 9, 1, 0x1); /* FCLKEN GPT8 */
+    //sr32(CM_ICLKEN_PER, 9, 1, 0x1); /* ICLKEN GPT8 */
    
-    udelay(200);
+    //udelay(200);
 
     /*start with a random brightness which consumes less than 500mA such that we will gain
       current into battery even when display is showing UI image*/
-    lcd_adjust_brightness(40); 
+    //lcd_adjust_brightness(40); 
     
-   	gpio_pin_init(GPIO_BACKLIGHT_EN_EVT2, GPIO_OUTPUT, 0);
+   	//gpio_pin_init(GPIO_BACKLIGHT_EN_EVT2, GPIO_OUTPUT, 0);
   
 }
 
 void disable_backlight(void)
 {
-    DECLARE_GLOBAL_DATA_PTR;
-    u32 l;
+    // FIXME: Populate with correct stuff if required.
+    //DECLARE_GLOBAL_DATA_PTR;
+    //u32 l;
 
-    l = read_gpt8_reg(TCLR);
-    l &= ~GPT8_PWM_EN;
-    write_gpt8_reg(TLDR, 0x0);
-    write_gpt8_reg(TTGR, 0x0);
-    write_gpt8_reg(TMAR, 0x0);
+    //l = read_gpt8_reg(TCLR);
+    //l &= ~GPT8_PWM_EN;
+    //write_gpt8_reg(TLDR, 0x0);
+    //write_gpt8_reg(TTGR, 0x0);
+    //write_gpt8_reg(TMAR, 0x0);
 
-    sr32(CM_FCLKEN_PER, 9, 1, 0x0); /* FCLKEN GPT8 */
-    sr32(CM_ICLKEN_PER, 9, 1, 0x0); /* ICLKEN GPT8 */
+    //sr32(CM_FCLKEN_PER, 9, 1, 0x0); /* FCLKEN GPT8 */
+    //sr32(CM_ICLKEN_PER, 9, 1, 0x0); /* ICLKEN GPT8 */
 
-    gpio_pin_write( GPIO_BACKLIGHT_EN_EVT2, 1 );
+    //gpio_pin_write( GPIO_BACKLIGHT_EN_EVT2, 1 );
 }
 void lcd_adjust_brightness(int level)
 {
-	 u32 value=0;
-    u32 v_tldr=0xfffffff0;
+    // FIXME: Populate with correct stuff if required.
+//	 u32 value=0;
+  //  u32 v_tldr=0xfffffff0;
     
    /*stop timer first*/
-    write_gpt8_reg(TCLR, 0x0);
+   // write_gpt8_reg(TCLR, 0x0);
     
      /*set the match value*/
-    value =  v_tldr  + ((0xFFFFFFFE - v_tldr) * level/100);
+    //value =  v_tldr  + ((0xFFFFFFFE - v_tldr) * level/100);
   
-  	 write_gpt8_reg(TMAR, value);  
+  //	 write_gpt8_reg(TMAR, value);  
   	  	 
     /*set the carrier freq to based on TLDR value*/
-    write_gpt8_reg(TLDR, v_tldr);
+    //write_gpt8_reg(TLDR, v_tldr);
   
   	 /*set the counter to compare */
-    write_gpt8_reg(TCRR, v_tldr);
+    //write_gpt8_reg(TCRR, v_tldr);
 
    
     /*start the PWM*/
-    value=GPT8_PWM_EN;
-    write_gpt8_reg(TCLR, value);
+    //value=GPT8_PWM_EN;
+    //write_gpt8_reg(TCLR, value);
 	
 }
 
-void boxer_disable_panel(void)
-{
-	 lcd_spi_send( 0x0, 0x00);
-}
-void boxer_init_panel(void)
-{
-   lcd_spi_send( 0x0, 0x00);
-	lcd_spi_send(   0, 0xad);
-	lcd_spi_send(   1, 0x30);
-	lcd_spi_send(   2, 0x40);
-	lcd_spi_send( 0xe, 0x5f);
-	lcd_spi_send( 0xf, 0xa4);
-	lcd_spi_send( 0xd, 0x00);
-	lcd_spi_send( 0x2, 0x43);
-	lcd_spi_send( 0xa, 0x28);
-	lcd_spi_send( 0x10, 0x41);
-}
+// FIXME: Do I need something equivalent?
+//void boxer_disable_panel(void)
+//{
+//	 lcd_spi_send( 0x0, 0x00);
+//}
+//void boxer_init_panel(void)
+//{
+//   lcd_spi_send( 0x0, 0x00);
+//	lcd_spi_send(   0, 0xad);
+//	lcd_spi_send(   1, 0x30);
+//	lcd_spi_send(   2, 0x40);
+//	lcd_spi_send( 0xe, 0x5f);
+//	lcd_spi_send( 0xf, 0xa4);
+//	lcd_spi_send( 0xd, 0x00);
+//	lcd_spi_send( 0x2, 0x43);
+//	lcd_spi_send( 0xa, 0x28);
+//	lcd_spi_send( 0x10, 0x41);
+//}
 
 
 void lcd_enable(void)
 {
-    if (lcd_disabled) {
-        lcd_ctrl_init(lcd_set_base);
-    }
+    // FIXME: Populate with correct items from disp_hanstar_init
+    //if (lcd_disabled) {
+    //    lcd_ctrl_init(lcd_set_base);
+    //}
 
-    gpio_pin_init(36, GPIO_OUTPUT, 1);
+    //gpio_pin_init(36, GPIO_OUTPUT, 1);
 
     // Wait one ms before sending down SPI init sequence
-    udelay(1000);
+    //udelay(1000);
 
-    MUX_VAL(CP(McBSP1_CLKR),    (OFF_IN_PD  | IEN  | PTD | DIS | M4))  /*McSPI4-CLK*/ \
+    //MUX_VAL(CP(McBSP1_CLKR),    (OFF_IN_PD  | IEN  | PTD | DIS | M4))  /*McSPI4-CLK*/ \
     MUX_VAL(CP(McBSP1_DX),      (OFF_IN_PD  | IDIS | PTD | DIS | M4))   /*McSPI4-SIMO*/ \
     MUX_VAL(CP(McBSP1_DR),      (OFF_IN_PD  | IEN  | PTD | DIS | M4))  /*McSPI4-SOMI*/\
     MUX_VAL(CP(McBSP1_FSX),     (OFF_IN_PD  | IEN  | PTU | DIS | M4))  /*McSPI4-CS0*/
    
-    gpio_pin_init(GPIO_SPI_CLK,GPIO_OUTPUT,1);  
-    gpio_pin_init(GPIO_SPI_SIMO,GPIO_OUTPUT,1);   
-    gpio_pin_init(GPIO_SPI_CS,GPIO_OUTPUT,1);  
+    //gpio_pin_init(GPIO_SPI_CLK,GPIO_OUTPUT,1);  
+    //gpio_pin_init(GPIO_SPI_SIMO,GPIO_OUTPUT,1);   
+    //gpio_pin_init(GPIO_SPI_CS,GPIO_OUTPUT,1);  
 
-    gpio_pin_init(GPIO_SPI_SOMI,GPIO_INPUT,1);   
+    //gpio_pin_init(GPIO_SPI_SOMI,GPIO_INPUT,1);   
   
-	boxer_init_panel();
+//	boxer_init_panel();
     
-    omap3_dss_enable();
-    enable_backlight();
+  //  omap3_dss_enable();
+    //enable_backlight();
     lcd_disabled = 0;
 }
 
 void lcd_disable(void)
 {
-    disable_backlight();
+    // FIXME: Populate with correct items from disp_hanstar_off   
+    //disable_backlight();
 
-    sr32(CM_FCLKEN_DSS, 0, 32, 0x0);
-	sr32(CM_ICLKEN_DSS, 0, 32, 0x0); 
+    //sr32(CM_FCLKEN_DSS, 0, 32, 0x0);
+//	sr32(CM_ICLKEN_DSS, 0, 32, 0x0); 
 
-    gpio_pin_write(36, 0);
+  //  gpio_pin_write(36, 0);
 
     // Restore SPI registers
-    MUX_VAL(CP(McBSP1_CLKR),    (IEN  | PTD | DIS | M1)) /*McSPI4-CLK*/ \
+    //MUX_VAL(CP(McBSP1_CLKR),    (IEN  | PTD | DIS | M1)) /*McSPI4-CLK*/ \
     MUX_VAL(CP(McBSP1_DX),      (IDIS | PTD | DIS | M1)) /*McSPI4-SIMO*/ \
     MUX_VAL(CP(McBSP1_DR),      (IEN  | PTD | DIS | M1)) /*McSPI4-SOMI*/\
     MUX_VAL(CP(McBSP1_FSX),     (IDIS | PTD | DIS | M1)) /*McSPI4-CS0*/
