@@ -62,11 +62,12 @@ vidinfo_t panel_info = {
     .vl_clor    = 1,
     .vl_tft     = 1,
 
+    /* Values from cmd_tft */
     .dss_panel_config = {
-        .timing_h   = 0x0c704527, 
-        .timing_v   = 0x00b00a09,
-        .pol_freq   = 0x7000,
-        .divisor    = 0x00010008,
+        .timing_h   = ((0xA0 << 20) | (0x18<<8) | (0x88)), 
+        .timing_v   = ((0x1D<<20) | (0x03<<8) | (0x06)),
+        .pol_freq   = 0x3000,
+        .divisor    = 0x00010002,
         .lcd_size   = (599 << 16) | (1023),
         .panel_type = 0x1,
         .data_lines = 0x3,
