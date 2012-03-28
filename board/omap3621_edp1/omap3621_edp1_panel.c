@@ -27,7 +27,6 @@
 #include <config.h>
 #include <common.h>
 #include <lcd.h>
-#include <spi.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/sys_info.h>
 #include <asm/arch/mux.h>
@@ -110,43 +109,6 @@ void lcd_ctrl_init(void *lcdbase)
 void lcd_setcolreg (ushort regno, ushort red, ushort green, ushort blue)
 {
 }
-
-#if (CONFIG_COMMANDS & CFG_CMD_SPI)
-void spi_panel_chipsel(int cs)
-{
-    if (cs) {
-        gpio_pin_init(GPIO_SPI_CS,0,0);
-    } else {
-        SPI_DELAY;
-        gpio_pin_init(GPIO_SPI_CS,0,1);
-    }
-}
-
-spi_chipsel_type spi_chipsel[] = {
-    spi_panel_chipsel,
-};
-
-int spi_chipsel_cnt = sizeof(spi_chipsel) / sizeof(spi_chipsel[0]);
-
-#endif /* (CONFIG_COMMANDS & CFG_CMD_SPI) */
-
-// Commented out - panel is not SPI so shouldn't be needed.
-// void lcd_spi_send(unsigned char reg_addr, unsigned char reg_data)
-// {
-//     int ret = 0;
-//     int msg,imsg;
-//     uchar omsg[2];
-//     msg=(reg_addr<<10)|reg_data;
-// 
-//     // note big endian, so swap
-//     omsg[0]=(msg>>8)&0xff;
-//     omsg[1]=(msg)&0xff;
-// 
-//     spi_xfer(spi_chipsel[0], 16,( uchar *)omsg, (uchar *) &imsg);
-// 
-//     // wait for transaction to finish
-//     udelay(400);
-// }
 
 static inline u32 read_gpt8_reg(u32 reg)
 {
