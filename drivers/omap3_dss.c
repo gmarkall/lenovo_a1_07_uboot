@@ -264,6 +264,15 @@ void omap3_dss_panel_config(const struct panel_config *panel_cfg)
 
 }
 
+// FIXME: Pasted from Nook sources. Check it's correct.
+void omap3_dss_mem_config(const struct panel_config *panel_cfg, void *mem)
+{
+    dss_write_reg(OMAP3621_DISPC_GFX_ATTRIBUTES, 0x1 | (0x6 << 1) | (2 << 6)); // enable and use RGB565, 15x32bit burst size
+    dss_write_reg(OMAP3621_DISPC_GFX_BA0, (u32) mem);
+    dss_write_reg(OMAP3621_DISPC_GFX_SIZE, (599 << 16) | 1023);
+}
+
+
 void omap3_dss_gfx_config(void)
 {
        dss_write_reg(OMAP3621_DISPC_GFX_BA0, LCD_FB_PHY_ADDR /* 0x805EC000 */);   //DISPC_GFX_BAj -> DISPC_GFX_BA0 default = 0x0

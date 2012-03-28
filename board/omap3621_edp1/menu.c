@@ -41,13 +41,20 @@
 #define MENUTOP		38
 
 
+// FIXME: Find out what this is.
+char read_u_boot_device(void) { return 'X'; }
+
+// FIXME: Implement this properly
+int gpio_read(int gpio) { return 0; }
+
 // -----------------------------------
 
 
 int do_menu() {
 
-	lcd_bl_set_brightness(255);
-	lcd_console_init();
+	// FIXME: Should this fn be implemented?
+        //lcd_bl_set_brightness(255);
+	//lcd_console_init();
 
 #define NUM_OPTS		8  //number of boot options
 
@@ -66,10 +73,11 @@ char *opt_list[NUM_OPTS] = 	{" Internal eMMC Normal     ",
 		u8 pwron = 0;
 		int ignore_last_option = 1;  // assume file is missing
 
-        if (twl6030_hw_status(&pwron)) {
-                lcd_console_setpos(MENUTOP, 2);
-                lcd_puts("Error: Failed to read twl6030 hw_status\n");
-        }
+        // FIXME: What is this?
+        //if (twl6030_hw_status(&pwron)) {
+        //        lcd_console_setpos(MENUTOP, 2);
+        //        lcd_puts("Error: Failed to read twl6030 hw_status\n");
+        //}
 
 		if (read_u_boot_device() != 'X') // if that file is there
 			{ ignore_last_option = 0;};
@@ -105,7 +113,7 @@ char *opt_list[NUM_OPTS] = 	{" Internal eMMC Normal     ",
 		lcd_console_setpos(MENUTOP, INDENT);
 	        lcd_puts(opt_list[0]);
 
-		do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0);  // wait for release
+		do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0) ;  // wait for release
 
 		do {
 		if (gpio_read(HOME_BUTTON) == 0) // button is pressed
