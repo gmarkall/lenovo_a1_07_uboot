@@ -217,53 +217,140 @@ void lcd_adjust_brightness(int level)
 //	lcd_spi_send( 0x10, 0x41);
 //}
 
+// Copied from cmd_tft.c
+static void display_config(void)
+{
+    omap3_dss_cm_config();
+//       omap3_dss_venc_config(&venc_config_std_tv); 
+    omap3_dss_panel_config(&dvid_cfg);
+    omap3_dss_set_background_col(DVI_BEAGLE_ORANGE_COL);
+    omap3_dss_gfx_config();
+    udelay(1000);
+    omap3_dss_enable();
+}
 
 void lcd_enable(void)
 {
     // FIXME: Populate with correct items from disp_hanstar_init
-    //if (lcd_disabled) {
-    //    lcd_ctrl_init(lcd_set_base);
-    //}
-
-    //gpio_pin_init(36, GPIO_OUTPUT, 1);
-
-    // Wait one ms before sending down SPI init sequence
-    //udelay(1000);
-
-    //MUX_VAL(CP(McBSP1_CLKR),    (OFF_IN_PD  | IEN  | PTD | DIS | M4))  /*McSPI4-CLK*/ \
-    MUX_VAL(CP(McBSP1_DX),      (OFF_IN_PD  | IDIS | PTD | DIS | M4))   /*McSPI4-SIMO*/ \
-    MUX_VAL(CP(McBSP1_DR),      (OFF_IN_PD  | IEN  | PTD | DIS | M4))  /*McSPI4-SOMI*/\
-    MUX_VAL(CP(McBSP1_FSX),     (OFF_IN_PD  | IEN  | PTU | DIS | M4))  /*McSPI4-CS0*/
-   
-    //gpio_pin_init(GPIO_SPI_CLK,GPIO_OUTPUT,1);  
-    //gpio_pin_init(GPIO_SPI_SIMO,GPIO_OUTPUT,1);   
-    //gpio_pin_init(GPIO_SPI_CS,GPIO_OUTPUT,1);  
-
-    //gpio_pin_init(GPIO_SPI_SOMI,GPIO_INPUT,1);   
-  
-//	boxer_init_panel();
+    if (lcd_disabled) {
+        lcd_ctrl_init(lcd_set_base);
+    }
     
-  //  omap3_dss_enable();
-    //enable_backlight();
+    // Taken from disp_hanstar_init
+    gpio_t *gpio1_base = (gpio_t *)OMAP34XX_GPIO1_BASE;
+    gpio_t *gpio2_base = (gpio_t *)OMAP34XX_GPIO2_BASE;
+    gpio_t *gpio4_base = (gpio_t *)OMAP34XX_GPIO4_BASE;
+    gpio_t *gpio5_base = (gpio_t *)OMAP34XX_GPIO5_BASE;
+
+
+    /* for CL1 */
+    /* <--LH_SWRD_CL1_Mervins@2011.05.17 */
+    /** /SHTDN High GPIO_37 **/
+
+    sr32((u32)&gpio2_base->oe, 5, 1, 0);
+    //sr32((u32)&gpio2_base->cleardataout, 5, 1, 1);
+    sr32((u32)&gpio2_base->res2[0], 5, 1, 0);
+
+    /* GPI0_49 LCD_STB1 */
+    sr32((u32)&gpio2_base->oe, 17, 1, 0);
+    //sr32((u32)&gpio2_base->cleardataout, 17, 1, 1);
+    sr32((u32)&gpio2_base->res2[0], 17, 1, 0);
+
+    /* GPIO_110 LCD_EN H:enable L:disable*/
+    sr32((u32)&gpio4_base->oe, 14, 1, 0);
+    sr32((u32)&gpio4_base->setdataout, 14, 1, 1); /* LCD_EN H:power enable */
+    udelay(80000);
+
+
+            /* GPIO_48 LCD_RST1 */
+    sr32((u32)&gpio2_base->oe, 16, 1, 0);
+    //sr32((u32)&gpio2_base->cleardataout, 16, 1, 1);
+    sr32((u32)&gpio2_base->res2[0], 16, 1, 0);
+    udelay(150000);
+    /* GPIO_61 LCD_POWER H:power enable L:power disable*/
+    sr32((u32)&gpio2_base->oe, 29, 1, 0);
+    sr32((u32)&gpio2_base->setdataout, 29, 1, 1); /* LCD_POWER H:power enable */
+
+    udelay(100000);
+    /* GPIO_159 VGH_CTRL */
+    sr32((u32)&gpio5_base->oe, 31, 1, 0);
+    sr32((u32)&gpio5_base->setdataout, 31, 1, 1);
+
+    udelay(100000);
+    /** /SHTDN High GPIO_37 **/
+    sr32((u32)&gpio2_base->oe, 5, 1, 0);
+    sr32((u32)&gpio2_base->setdataout, 5, 1, 1);
+    /* LH_SWRD_CL1_Mervins@2011.05.17--> */
+
+
+    udelay(500);
+    display_config();
+
+    zoom_pwm_init();
+    zoom_pwm_config(220);
+    zoom_pwm_enable(1);
+    udelay(300000);
+
+    /** Enable LCD_BL_EN GPIO_38 **/
+    sr32((u32)&gpio2_base->oe, 6, 1, 0);
+    sr32((u32)&gpio2_base->setdataout, 6, 1, 1);
+
+    udelay(10000);
+    zoom_pwm_config(180);
+    udelay(10000);
+    zoom_pwm_config(140);
+    udelay(10000);
+    zoom_pwm_config(100);
+    udelay(10000);
+    zoom_pwm_config(30);
+    // End of code copied from disp_hanstar_init
+
+    omap3_dss_enable();
     lcd_disabled = 0;
 }
+
 
 void lcd_disable(void)
 {
     // FIXME: Populate with correct items from disp_hanstar_off   
-    //disable_backlight();
+    
+    // Copied from disp_hanstar_off
+    gpio_t *gpio1_base = (gpio_t *)OMAP34XX_GPIO1_BASE;
+    gpio_t *gpio2_base = (gpio_t *)OMAP34XX_GPIO2_BASE;
+    gpio_t *gpio4_base = (gpio_t *)OMAP34XX_GPIO4_BASE;
+    gpio_t *gpio5_base = (gpio_t *)OMAP34XX_GPIO5_BASE;
 
-    //sr32(CM_FCLKEN_DSS, 0, 32, 0x0);
-//	sr32(CM_ICLKEN_DSS, 0, 32, 0x0); 
+    /* for CL1 */
+    /** Disable LCD_BL_EN GPIO_38 **/
+    //sr32((u32)&gpio2_base->cleardataout, 6, 1, 1);
+    sr32((u32)&gpio2_base->res2[0], 6, 1, 0);
+    udelay(30000);
+    /* GPI0_49 LCD_STB1 */
+    sr32((u32)&gpio2_base->setdataout, 16, 1, 1);
+    udelay(10000);
+    sr32((u32)&gpio2_base->setdataout, 17, 1, 1);
 
-  //  gpio_pin_write(36, 0);
+    udelay(10000);
+    /** /SHTDN High GPIO_37 **/
+    //sr32((u32)&gpio2_base->cleardataout, 5, 1, 1);
+    sr32((u32)&gpio2_base->res2[0], 5, 1, 0);
 
-    // Restore SPI registers
-    //MUX_VAL(CP(McBSP1_CLKR),    (IEN  | PTD | DIS | M1)) /*McSPI4-CLK*/ \
-    MUX_VAL(CP(McBSP1_DX),      (IDIS | PTD | DIS | M1)) /*McSPI4-SIMO*/ \
-    MUX_VAL(CP(McBSP1_DR),      (IEN  | PTD | DIS | M1)) /*McSPI4-SOMI*/\
-    MUX_VAL(CP(McBSP1_FSX),     (IDIS | PTD | DIS | M1)) /*McSPI4-CS0*/
+    udelay(20000);
+    /* GPIO_159 VGH_CTRL */
+    sr32((u32)&gpio5_base->cleardataout, 31, 1, 1);
+    udelay(40000);
+    /* GPIO_61 LCD_POWER H:power enable L:power disable*/
+    //sr32((u32)&gpio2_base->cleardataout, 29, 1, 1); /* LCD_POWER H:power enable */
+    sr32((u32)&gpio2_base->res2[0], 29, 1, 0);
+    udelay(40000);
 
+    /* GPIO_110 LCD_EN H:enable L:disable*/
+    sr32((u32)&gpio4_base->cleardataout, 14, 1, 1); /* LCD_EN H:power enable */
+    udelay(40000);
+    //zoom_pwm_enable(0);   
+    omap3_dss_cm_config_off();
+    // End of stuff copied from disp_hanstar_off
+   
     lcd_disabled = 1;
 }
 
