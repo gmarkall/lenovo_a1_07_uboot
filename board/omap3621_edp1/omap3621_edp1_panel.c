@@ -30,6 +30,8 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/sys_info.h>
 #include <asm/arch/mux.h>
+#include <asm/io.h>
+
 
 typedef enum {
     GPIO_OUTPUT = 0,
@@ -217,14 +219,85 @@ void lcd_adjust_brightness(int level)
 //	lcd_spi_send( 0x10, 0x41);
 //}
 
+// Copied from cmd_tft.c to support the zoom_pwm_* stuff
+#define CM_FCLKEN                                       0x0000
+#define CM_CLKSEL                                       0x0040
+#define CM_ICLKEN                                       0x0010
+#define PER_CM_MOD                              0x800
+#define GPTIMER8                                        0x4903E000
+
+#define OMAP3430_CLKSEL_GPT8_MASK                       (1 << 6)
+#define OMAP3430_CLKSEL_GPT8_SHIFT              6
+#define OMAP3430_EN_GPT8                                                        (1 << 9)
+#define OMAP3430_EN_GPT8_SHIFT                          9
+#define OMAP3430_CM_BASE                                                        0x48004800
+
+/* Read-modify-write a register in a CM module. Caller must lock */
+static int cm_rmw_mod_reg_bits(u32 mask, u32 bits, s16 module, s16 idx)
+{
+        u32 v;
+
+        v = __raw_readl(OMAP3430_CM_BASE + module + idx);
+        v &= ~mask;
+        v |= bits;
+        __raw_writel(v, OMAP3430_CM_BASE+ module + idx);
+
+        return 0;
+}
+
+
+// FIXME: The zoom_pwm_* functions are copied from cmd_tft.c - I suspect that they're not
+// sensibly named.
+static int zoom_pwm_init(void)
+{
+        cm_rmw_mod_reg_bits(OMAP3430_CLKSEL_GPT8_MASK, 0x1 << OMAP3430_CLKSEL_GPT8_SHIFT, PER_CM_MOD, CM_CLKSEL);
+        cm_rmw_mod_reg_bits(OMAP3430_EN_GPT8, 0x1 << OMAP3430_EN_GPT8_SHIFT, PER_CM_MOD, CM_FCLKEN);
+        cm_rmw_mod_reg_bits(OMAP3430_EN_GPT8, 0x1 << OMAP3430_EN_GPT8_SHIFT, PER_CM_MOD, CM_ICLKEN);
+
+        __raw_writel(0x4, GPTIMER8+ 0x040);
+
+        __raw_writel(0xFFFFFFFE, GPTIMER8+ 0x038);
+        __raw_writel(0xFFFFFAEC, GPTIMER8+ 0x02C);
+        __raw_writel(0x00000001, GPTIMER8+ 0x030);
+        __raw_writel(0xFFFF0000, GPTIMER8+ 0x028);
+
+        __raw_writel(0x00001847, GPTIMER8+ 0x024);
+
+        return 0;
+}
+
+static void zoom_pwm_enable(int enable)
+{
+        if(enable){
+                        __raw_writel(0x00001847, GPTIMER8+ 0x024);
+        }else{
+                        __raw_writel(0x00001846, GPTIMER8+ 0x024);
+                        //cm_rmw_mod_reg_bits(OMAP3430_EN_GPT8, 0x0 << OMAP3430_EN_GPT8_SHIFT, PER_CM_MOD, CM_FCLKEN);
+                        //cm_rmw_mod_reg_bits(OMAP3430_EN_GPT8, 0x0 << OMAP3430_EN_GPT8_SHIFT, PER_CM_MOD, CM_ICLKEN);
+        }
+}
+
+static void zoom_pwm_config(u8 brightness)
+{
+        u32 omap_pwm;
+/*20kHz*/
+        omap_pwm = 0xFFFFFAEC + (brightness*0x5);
+/*128Hz*/
+//      omap_pwm = 0xFFFCE68B + (brightness*793);
+
+        __raw_writel(omap_pwm, GPTIMER8+ 0x038);
+}
+
+
 // Copied from cmd_tft.c
 static void display_config(void)
 {
     omap3_dss_cm_config();
 //       omap3_dss_venc_config(&venc_config_std_tv); 
-    omap3_dss_panel_config(&dvid_cfg);
-    omap3_dss_set_background_col(DVI_BEAGLE_ORANGE_COL);
-    omap3_dss_gfx_config();
+    //omap3_dss_panel_config(&dvid_cfg);
+    //omap3_dss_set_background_col(DVI_BEAGLE_ORANGE_COL);
+    // FIXME: Not sure of omap3_dss_gfx_config is necessary
+    //omap3_dss_gfx_config();
     udelay(1000);
     omap3_dss_enable();
 }
