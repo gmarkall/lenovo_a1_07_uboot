@@ -465,10 +465,18 @@ void main_loop (void)
 
 
 #if defined (CONFIG_UPGRADE_MEM)
-	if(upgrade_mem_handle() != 0)
+	switch(upgrade_mem_handle())
 	{
+          case 2:
 		run_command("recoverymode",0);	
-	}
+                break;
+          case 1:
+                twl4030_usb_init();
+                run_command("fastboot", 0);
+                break;
+          default:
+                break;
+	} 
 #endif
 
 #if defined (CONFIG_GPS_DEBUG_UART_SWITCH)

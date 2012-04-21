@@ -1853,7 +1853,7 @@ omap3621_edp1_tft_config :    unconfig
 	$(MAKE) omap3621_edp1_config
 	echo '#define CFG_TFT_DISPLAY (1)' >> include/config.h
 ###/* <--LH_SWRD_CL1_Mervins@2011.05.19 */
-	svn info > svninfo
+	git show-ref --head --abbrev --hash | head -n1 > svninfo
 	sed -n 's/Last Changed Rev\:/#define CONFIG_SVN_REVISION/p' svninfo  >> include/config.h
 ###/* LH_SWRD_CL1_Mervins@2011.05.19--> */
 
