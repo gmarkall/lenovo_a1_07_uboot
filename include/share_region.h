@@ -107,9 +107,11 @@ enum {
 	BOOT_NORMAL = 0,
 	BOOT_PRODUCT_LINE,
 	BOOT_SYSTEM_UPGRADE,
-	BOOT_FACTORY_RESET
+	BOOT_FACTORY_RESET,
+        BOOT_FASTBOOT
 };
 
+void reset_upgrade_mem(void);
 extern void save_upgrade_mem(void);
 extern int recovery_handle(void);
 extern int  upgrade_mem_handle(void);

@@ -467,11 +467,13 @@ void main_loop (void)
 #if defined (CONFIG_UPGRADE_MEM)
 	switch(upgrade_mem_handle())
 	{
-          case 2:
+          case BOOT_SYSTEM_UPGRADE:
 		run_command("recoverymode",0);	
                 break;
-          case 1:
+          case BOOT_FASTBOOT:
                 twl4030_usb_init();
+                reset_upgrade_mem();
+                run_command("logo_red", 0);
                 run_command("fastboot", 0);
                 break;
           default:

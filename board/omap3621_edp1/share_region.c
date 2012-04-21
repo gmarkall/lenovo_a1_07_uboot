@@ -142,6 +142,11 @@ void save_upgrade_mem(void)
     }
 }
 
+void reset_upgrade_mem(void)
+{
+    upgrade_mem->flags.update_flag = BOOT_NORMAL;
+}
+
 int upgrade_mem_handle(void)
 {
 	int ret_value;
