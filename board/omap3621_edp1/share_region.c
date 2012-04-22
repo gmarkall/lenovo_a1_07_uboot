@@ -116,8 +116,8 @@ int recovery_handle(void)
 		goto out;
 	}
 	else if (ret == 2){                        
-		upgrade_mem->flags.update_flag = BOOT_FASTBOOT; /*volume up for fastboot */
-		ret = BOOT_FASTBOOT;
+		upgrade_mem->flags.update_flag = BOOT_FASTBOOT_RED; /*volume up for fastboot */
+		ret = BOOT_FASTBOOT_RED;
 		goto out;
 
 	}

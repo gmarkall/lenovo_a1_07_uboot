@@ -470,7 +470,7 @@ void main_loop (void)
           case BOOT_SYSTEM_UPGRADE:
 		run_command("recoverymode",0);	
                 break;
-          case BOOT_FASTBOOT:
+          case BOOT_FASTBOOT_RED:
                 twl4030_usb_init();
                 reset_upgrade_mem();
                 run_command("logo_red", 0);

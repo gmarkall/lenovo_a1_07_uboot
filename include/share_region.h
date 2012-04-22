@@ -108,7 +108,7 @@ enum {
 	BOOT_PRODUCT_LINE,
 	BOOT_SYSTEM_UPGRADE,
 	BOOT_FACTORY_RESET,
-        BOOT_FASTBOOT
+        BOOT_FASTBOOT_RED
 };
 
 void reset_upgrade_mem(void);
