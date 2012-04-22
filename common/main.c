@@ -372,13 +372,13 @@ void main_loop (void)
 /* Disabling the check of 'OK' key press to reduce the boot time. */
 //&*&*&*20101201_Peter ++
 #if defined(CONFIG_FASTBOOT) && defined(CONFIG_TWL4030_KEYPAD)
-	if (fastboot_preboot()) {
+	/*if (fastboot_preboot()) {
 		puts("===================================\n");
 		puts("===== FASTBOOT DOWNLOAD MODE  =====\n");
 		puts("===================================\n");
 		twl4030_usb_init();
 		run_command("fastboot", 0);
-	}	
+	}	*/
 #endif
 //&*&*&*20101201_Peter --
 #ifdef CONFIG_PREBOOT

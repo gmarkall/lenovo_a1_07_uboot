@@ -111,13 +111,13 @@ int recovery_handle(void)
 	/******************about the product-line reset and upgrade**********************/	
 	ret = twl4030_keypad_read_volume_key();
 	if(ret == 1){
-		upgrade_mem->flags.update_flag = 2; /*volume up for upgrade*/
+		upgrade_mem->flags.update_flag = BOOT_SYSTEM_UPGRADE; /*volume down for recovery */
 		ret = BOOT_SYSTEM_UPGRADE;
 		goto out;
 	}
 	else if (ret == 2){                        
-		upgrade_mem->flags.update_flag = 1; /*volume down for product-line*/
-		ret = BOOT_PRODUCT_LINE;
+		upgrade_mem->flags.update_flag = BOOT_FASTBOOT; /*volume up for fastboot */
+		ret = BOOT_FASTBOOT;
 		goto out;
 
 	}
