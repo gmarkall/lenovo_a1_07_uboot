@@ -37,8 +37,8 @@
 
 #define HOME_BUTTON	32
 #define POWER_BUTTON	29
-#define INDENT		25
-#define MENUTOP		38
+#define INDENT		8
+#define MENUTOP		8
 
 
 // FIXME: Find out what this is.
@@ -113,10 +113,13 @@ char *opt_list[NUM_OPTS] = 	{" Internal eMMC Normal     ",
 		lcd_console_setpos(MENUTOP, INDENT);
 	        lcd_puts(opt_list[0]);
 
-		do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0) ;  // wait for release
+                int key;
+
+		// FIXME: Reimplement this for A1 power button
+                //do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0) ;  // wait for release
 
 		do {
-		if (gpio_read(HOME_BUTTON) == 0) // button is pressed
+		if ((key = twl4030_keypad_read_volume_key()) != 0) // button is pressed
 		   {
 			// unhighlight current option
 			lcd_console_setcolor(CONSOLE_COLOR_CYAN, CONSOLE_COLOR_BLACK);
@@ -140,7 +143,7 @@ char *opt_list[NUM_OPTS] = 	{" Internal eMMC Normal     ",
 					} else {
 					lcd_puts("SD   "); }
 				}
-			do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0);  //wait for release
+			do {udelay(100);} while (twl4030_keypad_read_volume_key() != 0);  //wait for release
 
 		   }
 
