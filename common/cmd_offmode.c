@@ -471,7 +471,6 @@ int off_mode_start( void )
 		chg_led_set(0);
 		ds278x_battery_get_property(POWER_SUPPLY_PROP_VOLTAGE_NOW, &BatteryVol);	
 		}	
-	check_battery_is_right();
 	/** <--LH_SWRD_CL1_Tanggang@2011.07.07, Add check battery Model*/
 	
 	g_bootup_reason = twl4030_bootup_reason_get();

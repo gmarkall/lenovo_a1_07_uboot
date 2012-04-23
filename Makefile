@@ -145,7 +145,6 @@ LIBS += drivers/sk98lin/libsk98lin.a
 LIBS += post/libpost.a post/cpu/libcpu.a
 LIBS += common/libcommon.a
 LIBS += off_mode/liboffmode.a
-LIBS += check_battery/libcheckbattery.a
 LIBS += $(BOARDLIBS)
 .PHONY : $(LIBS)
 
