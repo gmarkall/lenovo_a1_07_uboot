@@ -126,12 +126,13 @@ int do_menu() {
     //do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0) ;  // wait for release
 
     do {
-        if ((key = twl4030_keypad_read_volume_key()) != 0) // button is pressed
+        if ((key = twl4030_keypad_read_volume_key())) // button is pressed
         {
             // unhighlight current option
             lcd_console_setcolor(CONSOLE_COLOR_CYAN, CONSOLE_COLOR_BLACK);
             lcd_console_setpos(MENUTOP+cursor, INDENT);
             lcd_puts(opt_list[cursor]);
+            
             if (cursor == CHANGE_BOOT_DEV) {
                 if (read_u_boot_device() == '1') {
                     lcd_puts("EMMC ");
@@ -139,7 +140,16 @@ int do_menu() {
                     lcd_puts("SD   ");
                 }
             }
-            cursor++;
+
+            switch (key) {
+            case KEY_VOLUME_DOWN:
+              cursor++;
+              break;
+            case KEY_VOLUME_UP:
+              cursor--;
+              break;
+            }
+            
             if (cursor == NUM_OPTS - ignore_last_option) cursor = 0;
             // highlight new option
             lcd_console_setcolor(CONSOLE_COLOR_BLACK, CONSOLE_COLOR_CYAN);
@@ -155,7 +165,7 @@ int do_menu() {
             do {
                 udelay(100);
             }
-            while (twl4030_keypad_read_volume_key() != 0);    //wait for release
+            while (twl4030_keypad_read_volume_key());    //wait for release
 
         }
 

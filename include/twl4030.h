@@ -494,3 +494,7 @@ int twl4030_hw_sts_get(void);
 int twl4030_keypad_read_volume_key(void);
 //20110531, use to judge whether the volume key is pressed.
 
+enum volume_keys {
+        KEY_VOLUME_DOWN = 1,
+        KEY_VOLUME_UP = 2
+};
