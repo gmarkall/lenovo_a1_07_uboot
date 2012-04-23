@@ -110,7 +110,7 @@ int do_menu() {
     lcd_puts(" \"n\" moves to next item");
     lcd_console_setpos(MENUTOP+11, INDENT);
     lcd_puts(" POWER button selects");
-    lcd_console_setpos(60, 0);
+    lcd_console_setpos(30, 0);
     lcd_puts(" ------\n Menu by j4mm3r.\n Redone by fattire - ALPHA (" __TIMESTAMP__  ") - ** EXPERIMENTAL **");
 
     cursor=0;
