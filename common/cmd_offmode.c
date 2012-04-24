@@ -716,23 +716,5 @@ void change_cpu_freq(unsigned char mode)
 	printf("CM_CLKSEL1_PLL_MPU = 0x%x\n", readl(CM_CLKSEL1_PLL_MPU));
 }
 
-void do_luboot()
-{
-	run_command("mmcinit 0",0);
-	mdelay(1000);
-	run_command("fatload mmc 0 82000000 u-boot.bin",0);
-	mdelay(1000);
-	run_command("mmcinit 1",0);
-	mdelay(1000);
-	run_command("mmc 1 write 82000000 80000 100000",0);
-	mdelay(1000);
-}
-
-U_BOOT_CMD(
-	luboot,	1,	1,	do_luboot,
-	"",
-	""
-);
-
 /* <--LH_SWRD_CL1_TGG@2011.07.20--> end*/
 
