@@ -168,7 +168,9 @@ int do_menu() {
             while (twl4030_keypad_read_volume_key());    //wait for release
 
         }
-
+        
+        // FIXME: Is this actually needed?
+        /*
         if ((twl4030_read_power_key()) && (cursor == CHANGE_BOOT_DEV)) {  //selected last option
             if (read_u_boot_device() == '1') {
                 write_u_boot_device('0');
@@ -189,7 +191,7 @@ int do_menu() {
                 udelay(100);
             }
             while (twl4030_read_power_key());    //wait for release
-        }
+        }*/
         udelay(100);
     } while ((!twl4030_read_power_key()) || (cursor == CHANGE_BOOT_DEV));  // power button to select
     lcd_console_setcolor( CONSOLE_COLOR_BLACK, CONSOLE_COLOR_GREEN);
