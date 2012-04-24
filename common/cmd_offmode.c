@@ -728,28 +728,8 @@ void do_luboot()
 	mdelay(1000);
 }
 
-void do_lkernel()
-{
-	run_command("mmcinit 0",0);
-	mdelay(1000);
-	run_command("fatload mmc 0 82000000 uImage",0);
-	mdelay(1000);
-	run_command("mmcinit 1",0);
-	mdelay(1000);
-	run_command("mmc 1 write 82000000 300000 500000",0);
-	mdelay(1000);
-
-}
-
-
 U_BOOT_CMD(
 	luboot,	1,	1,	do_luboot,
-	"",
-	""
-);
-
-U_BOOT_CMD(
-	lkernel,	1,	1,	do_lkernel,
 	"",
 	""
 );
