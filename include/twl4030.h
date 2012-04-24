@@ -492,9 +492,11 @@ int twl4030_get_battery_voltage(void);
 int twl4030_hw_sts_get(void);
 //&*&*&*HC2_20110428, enable pwr key long press function 
 int twl4030_keypad_read_volume_key(void);
+int twl4030_read_a1_07_keys(void);
 //20110531, use to judge whether the volume key is pressed.
 
 enum volume_keys {
         KEY_VOLUME_DOWN = 1,
-        KEY_VOLUME_UP = 2
+        KEY_VOLUME_UP = 2,
+        KEY_POWER = 3
 };
