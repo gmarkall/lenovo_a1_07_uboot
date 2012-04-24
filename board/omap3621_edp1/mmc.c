@@ -336,7 +336,6 @@ static void display_feedback(enum boot_action image)
 
 int determine_boot_type(void)
 {
-        /* FIXME: Initialise LCD here */
         /*
         if (running_from_sd()) {
                 lcd_putc('S');
@@ -349,16 +348,21 @@ int determine_boot_type(void)
 
         switch(result) {
         case BOOT_SD_NORMAL:
-             //   setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 boot.img; booti 0x81000000");
-             //   setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
                 display_feedback(BOOT_SD_NORMAL);
+                setenv("bootargs", "console=ttyVSP1,115200n8 root=/dev/mmcblk1p2 rw rootwait init=/init videoout=omap24xxvout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram=0:6M androidboot.console=ttyVSP1");
+                run_command("mmcinit 0; fatload mmc 0 0x82000000 uImage; bootm 0x82000000", 0);
                 break;
 
         case BOOT_SD_RECOVERY:
-            //    setenv ("bootcmd", "setenv setbootargs setenv bootargs ${sdbootargs}; run setbootargs; mmcinit 0; fatload mmc 0:1 0x81000000 recovery.img; booti 0x81000000");
-            //    setenv ("altbootcmd", "run bootcmd"); // for sd boot altbootcmd is the same as bootcmd
-                run_command("recoverymode",0);  
                 display_feedback(BOOT_SD_RECOVERY);
+                run_command("mmcinit 0; fatload mmc 0 0x82000000 uImage;fatload mmc 0 0x83000000 recovery.img", 0);
+                run_command("set bootargs console=ttyO0,115200n8 root=/dev/ram0  init=/init",0);
+                result = getenv("filesize");
+                if (result) {
+                    run_command("bootm 0x82000000 0x83000000", 0);
+                } else {
+                    printf("Error booting recovery from SD...");
+                }
                 break;
 
         case BOOT_SD_ALTBOOT:
@@ -367,17 +371,16 @@ int determine_boot_type(void)
                 display_feedback(BOOT_SD_ALTBOOT);
                 break;
 
-        //actually, boot from boot+512K -- thanks bauwks!
         case BOOT_EMMC_NORMAL:
-            //    setenv("bootcmd", "mmcinit 1; booti mmc1 boot 0x80000");
-            //    display_feedback(BOOT_EMMC_NORMAL);
+                display_feedback(BOOT_EMMC_NORMAL);
+                setenv("bootargs", "console=ttyVSP1,115200n8 rootwait init=/init videoout=omap24xxvout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram=0:6M androidboot.console=ttyVSP1");
+                run_command("mmcinit 1; mmc 1 read 82000000 300000 310000; bootm 82000000");
                 break;
 
-        //actually, boot from recovery+512K -- thanks bauwks!
         case BOOT_EMMC_RECOVERY:
-             //   setenv("bootcmd", "mmcinit 1; booti mmc1 recovery 0x80000");
-             //   display_feedback(BOOT_EMMC_RECOVERY);
-                run_command("recoverymode",0);
+                display_feedback(BOOT_EMMC_RECOVERY);
+                run_command("set bootargs console=ttyO0,115200n8 root=/dev/ram0  init=/init",0);
+                run_command("mmcinit 1; mclear 80800000 1000000;mmc 1 read 82000000 300000 800000;mmc 1 read 83000000 c00000 400000; bootm 82000000 83000000");
                 break;
 
         case BOOT_EMMC_ALTBOOT:  // no 512K offset, this is just a file.
