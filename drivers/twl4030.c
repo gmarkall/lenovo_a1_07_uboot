@@ -728,7 +728,7 @@ int twl4030_keypad_read_volume_key(void)
 
 }
 
-int twl4030_read_power_button(void)
+int twl4030_read_power_key(void)
 {
   return (twl4030_hw_sts_get() & 0x1);
 }
@@ -742,7 +742,7 @@ int twl4030_read_a1_07_keys(void)
   }
   else
   {
-    if (twl4030_read_power_button())
+    if (twl4030_read_power_key())
     {
       return KEY_POWER;
     }

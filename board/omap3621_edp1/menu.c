@@ -123,7 +123,7 @@ int do_menu() {
     int key;
 
     // FIXME: Reimplement this for A1 power button
-    //do {udelay(100);} while (gpio_read(HOME_BUTTON) == 0) ;  // wait for release
+    do {udelay(100);} while (twl4030_read_power_key()) ;  // wait for release
 
     do {
         if ((key = twl4030_keypad_read_volume_key())) // button is pressed
@@ -169,7 +169,7 @@ int do_menu() {
 
         }
 
-        if ((gpio_read(POWER_BUTTON) == 1) && (cursor == CHANGE_BOOT_DEV)) {  //selected last option
+        if ((twl4030_read_power_key()) && (cursor == CHANGE_BOOT_DEV)) {  //selected last option
             if (read_u_boot_device() == '1') {
                 write_u_boot_device('0');
             }
@@ -188,10 +188,10 @@ int do_menu() {
             do {
                 udelay(100);
             }
-            while (gpio_read(POWER_BUTTON) == 1);    //wait for release
+            while (twl4030_read_power_key());    //wait for release
         }
         udelay(100);
-    } while ((gpio_read(POWER_BUTTON) == 0) || (cursor == CHANGE_BOOT_DEV));  // power button to select
+    } while ((!twl4030_read_power_key()) || (cursor == CHANGE_BOOT_DEV));  // power button to select
     lcd_console_setcolor( CONSOLE_COLOR_BLACK, CONSOLE_COLOR_GREEN);
     lcd_console_setpos(MENUTOP+cursor, INDENT);
     lcd_puts(opt_list[cursor]);
