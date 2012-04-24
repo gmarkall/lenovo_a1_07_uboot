@@ -361,6 +361,8 @@ int determine_boot_type(void)
                 if (result) {
                     run_command("bootm 0x82000000 0x83000000", 0);
                 } else {
+                    /* FIXME: getenv returns a pointer - does this message reflect the
+                    true meaning of a null pointer? */
                     printf("Error booting recovery from SD...");
                 }
                 break;
@@ -374,13 +376,13 @@ int determine_boot_type(void)
         case BOOT_EMMC_NORMAL:
                 display_feedback(BOOT_EMMC_NORMAL);
                 setenv("bootargs", "console=ttyVSP1,115200n8 rootwait init=/init videoout=omap24xxvout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram=0:6M androidboot.console=ttyVSP1");
-                run_command("mmcinit 1; mmc 1 read 82000000 300000 310000; bootm 82000000");
+                run_command("mmcinit 1; mmc 1 read 82000000 300000 310000; bootm 82000000", 0);
                 break;
 
         case BOOT_EMMC_RECOVERY:
                 display_feedback(BOOT_EMMC_RECOVERY);
                 run_command("set bootargs console=ttyO0,115200n8 root=/dev/ram0  init=/init",0);
-                run_command("mmcinit 1; mclear 80800000 1000000;mmc 1 read 82000000 300000 800000;mmc 1 read 83000000 c00000 400000; bootm 82000000 83000000");
+                run_command("mmcinit 1; mclear 80800000 1000000;mmc 1 read 82000000 300000 800000;mmc 1 read 83000000 c00000 400000; bootm 82000000 83000000", 0);
                 break;
 
         case BOOT_EMMC_ALTBOOT:  // no 512K offset, this is just a file.
